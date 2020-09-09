@@ -12,13 +12,13 @@
           "Emgu.CV": "3.0.0.2157",
           "Emgu.CV.UI": "3.0.0.2157",
           "Emgu.Util": "3.0.0.2157",
-          "NationalInstruments.Common": "13.0.35.190",
-          "NationalInstruments.Common.Native": "13.0.35.190",
-          "NationalInstruments.MStudioCLM": "13.0.35.190",
-          "NationalInstruments.NiLmClientDLL": "13.0.35.190",
+          "NationalInstruments.Common": "13.5.35.173",
+          "NationalInstruments.Common.Native": "12.0.20.258",
+          "NationalInstruments.MStudioCLM": "13.5.35.173",
+          "NationalInstruments.NiLmClientDLL": "13.5.35.173",
           "NationalInstruments.Vision.Acquisition.Imaq": "4.60.35.49153",
-          "NationalInstruments.Vision.Acquisition.Imaqdx": "3.40.35.49153",
-          "NationalInstruments.Vision.Common": "13.1.35.100"
+          "NationalInstruments.Vision.Common": "13.1.35.100",
+          "System.Windows.Forms": "4.0.0.0"
         },
         "runtime": {
           "ParaBehavior.dll": {}
@@ -138,35 +138,35 @@
           }
         }
       },
-      "NationalInstruments.Common/13.0.35.190": {
+      "NationalInstruments.Common/13.5.35.173": {
         "runtime": {
           "NationalInstruments.Common.dll": {
-            "assemblyVersion": "13.0.35.190",
-            "fileVersion": "13.0.35.190"
+            "assemblyVersion": "13.5.35.173",
+            "fileVersion": "13.5.35.173"
           }
         }
       },
-      "NationalInstruments.Common.Native/13.0.35.190": {
+      "NationalInstruments.Common.Native/12.0.20.258": {
         "runtime": {
           "NationalInstruments.Common.Native.dll": {
-            "assemblyVersion": "13.0.35.190",
-            "fileVersion": "13.0.35.190"
+            "assemblyVersion": "12.0.20.258",
+            "fileVersion": "12.0.20.258"
           }
         }
       },
-      "NationalInstruments.MStudioCLM/13.0.35.190": {
+      "NationalInstruments.MStudioCLM/13.5.35.173": {
         "runtime": {
           "NationalInstruments.MStudioCLM.dll": {
-            "assemblyVersion": "13.0.35.190",
-            "fileVersion": "13.0.35.190"
+            "assemblyVersion": "13.5.35.173",
+            "fileVersion": "13.5.35.173"
           }
         }
       },
-      "NationalInstruments.NiLmClientDLL/13.0.35.190": {
+      "NationalInstruments.NiLmClientDLL/13.5.35.173": {
         "runtime": {
           "NationalInstruments.NiLmClientDLL.dll": {
-            "assemblyVersion": "13.0.35.190",
-            "fileVersion": "13.0.35.190"
+            "assemblyVersion": "13.5.35.173",
+            "fileVersion": "13.5.35.173"
           }
         }
       },
@@ -178,14 +178,6 @@
           }
         }
       },
-      "NationalInstruments.Vision.Acquisition.Imaqdx/3.40.35.49153": {
-        "runtime": {
-          "NationalInstruments.Vision.Acquisition.Imaqdx.dll": {
-            "assemblyVersion": "3.40.35.49153",
-            "fileVersion": "3.40.35.49153"
-          }
-        }
-      },
       "NationalInstruments.Vision.Common/13.1.35.100": {
         "runtime": {
           "NationalInstruments.Vision.Common.dll": {
@@ -194,11 +186,43 @@
           }
         }
       },
+      "System.Windows.Forms/4.0.0.0": {
+        "runtime": {
+          "System.Windows.Forms.dll": {
+            "assemblyVersion": "4.0.0.0",
+            "fileVersion": "4.8.4200.0"
+          }
+        }
+      },
       "ZedGraph/5.1.5.28844": {
         "runtime": {
           "ZedGraph.dll": {
             "assemblyVersion": "5.1.5.28844",
             "fileVersion": "5.1.5.28844"
+          }
+        }
+      },
+      "Accessibility/4.0.0.0": {
+        "runtime": {
+          "Accessibility.dll": {
+            "assemblyVersion": "4.0.0.0",
+            "fileVersion": "4.8.4084.0"
+          }
+        }
+      },
+      "System.Deployment/4.0.0.0": {
+        "runtime": {
+          "System.Deployment.dll": {
+            "assemblyVersion": "4.0.0.0",
+            "fileVersion": "4.8.4200.0"
+          }
+        }
+      },
+      "System.Runtime.Serialization.Formatters.Soap/4.0.0.0": {
+        "runtime": {
+          "System.Runtime.Serialization.Formatters.Soap.dll": {
+            "assemblyVersion": "4.0.0.0",
+            "fileVersion": "4.8.4084.0"
           }
         }
       }
@@ -295,22 +319,22 @@
       "serviceable": false,
       "sha512": ""
     },
-    "NationalInstruments.Common/13.0.35.190": {
+    "NationalInstruments.Common/13.5.35.173": {
       "type": "reference",
       "serviceable": false,
       "sha512": ""
     },
-    "NationalInstruments.Common.Native/13.0.35.190": {
+    "NationalInstruments.Common.Native/12.0.20.258": {
       "type": "reference",
       "serviceable": false,
       "sha512": ""
     },
-    "NationalInstruments.MStudioCLM/13.0.35.190": {
+    "NationalInstruments.MStudioCLM/13.5.35.173": {
       "type": "reference",
       "serviceable": false,
       "sha512": ""
     },
-    "NationalInstruments.NiLmClientDLL/13.0.35.190": {
+    "NationalInstruments.NiLmClientDLL/13.5.35.173": {
       "type": "reference",
       "serviceable": false,
       "sha512": ""
@@ -320,17 +344,32 @@
       "serviceable": false,
       "sha512": ""
     },
-    "NationalInstruments.Vision.Acquisition.Imaqdx/3.40.35.49153": {
-      "type": "reference",
-      "serviceable": false,
-      "sha512": ""
-    },
     "NationalInstruments.Vision.Common/13.1.35.100": {
       "type": "reference",
       "serviceable": false,
       "sha512": ""
     },
+    "System.Windows.Forms/4.0.0.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
     "ZedGraph/5.1.5.28844": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Accessibility/4.0.0.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "System.Deployment/4.0.0.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "System.Runtime.Serialization.Formatters.Soap/4.0.0.0": {
       "type": "reference",
       "serviceable": false,
       "sha512": ""

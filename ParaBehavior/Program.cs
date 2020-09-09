@@ -61,7 +61,7 @@ namespace ParaBehavior
                 image = _session.Acquisition.Extract(j, out buff_out);
                 data_2D = image.ToPixelArray().U8;
                 cvimage.SetTo(data_2D);
-                CvInvoke.Imshow(camerawindow, modeimage);
+                CvInvoke.Imshow(camerawindow, cvimage);
                 CvInvoke.WaitKey(1);
             }
              

@@ -5,6 +5,10 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <PlatformTarget>x86</PlatformTarget>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="System.IO.Ports" Version="4.7.0" />
   </ItemGroup>
@@ -20,25 +24,25 @@
       <HintPath>..\..\PullPara\PullPara\bin\Debug\Emgu.Util.dll</HintPath>
     </Reference>
     <Reference Include="NationalInstruments.Common">
-      <HintPath>..\..\..\..\Program Files (x86)\National Instruments\MeasurementStudioVS2008\DotNET\Assemblies\Current\NationalInstruments.Common.dll</HintPath>
+      <HintPath>..\..\PullPara\PullPara\bin\Debug\NationalInstruments.Common.dll</HintPath>
     </Reference>
     <Reference Include="NationalInstruments.Common.Native">
-      <HintPath>..\..\..\..\Program Files (x86)\National Instruments\MeasurementStudioVS2008\DotNET\Assemblies\Current\NationalInstruments.Common.Native.dll</HintPath>
+      <HintPath>..\..\PullPara\PullPara\bin\Debug\NationalInstruments.Common.Native.dll</HintPath>
     </Reference>
     <Reference Include="NationalInstruments.MStudioCLM">
-      <HintPath>..\..\..\..\Program Files (x86)\National Instruments\MeasurementStudioVS2008\DotNET\Assemblies\Current\NationalInstruments.MStudioCLM.dll</HintPath>
+      <HintPath>..\..\PullPara\PullPara\bin\Debug\NationalInstruments.MStudioCLM.dll</HintPath>
     </Reference>
     <Reference Include="NationalInstruments.NiLmClientDLL">
-      <HintPath>..\..\..\..\Program Files (x86)\National Instruments\MeasurementStudioVS2008\DotNET\Assemblies\Current\NationalInstruments.NiLmClientDLL.dll</HintPath>
+      <HintPath>..\..\PullPara\PullPara\bin\Debug\NationalInstruments.NiLmClientDLL.dll</HintPath>
     </Reference>
     <Reference Include="NationalInstruments.Vision.Acquisition.Imaq">
-      <HintPath>..\..\..\..\Program Files (x86)\National Instruments\MeasurementStudioVS2008\DotNET\Assemblies\Current\NationalInstruments.Vision.Acquisition.Imaq.dll</HintPath>
-    </Reference>
-    <Reference Include="NationalInstruments.Vision.Acquisition.Imaqdx">
-      <HintPath>..\..\..\..\Program Files (x86)\National Instruments\MeasurementStudioVS2008\DotNET\Assemblies\Current\NationalInstruments.Vision.Acquisition.Imaqdx.dll</HintPath>
+      <HintPath>..\..\PullPara\PullPara\bin\Debug\NationalInstruments.Vision.Acquisition.Imaq.dll</HintPath>
     </Reference>
     <Reference Include="NationalInstruments.Vision.Common">
-      <HintPath>..\..\..\..\Program Files (x86)\National Instruments\MeasurementStudioVS2008\DotNET\Assemblies\Current\NationalInstruments.Vision.Common.dll</HintPath>
+      <HintPath>..\..\PullPara\PullPara\bin\Debug\NationalInstruments.Vision.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Windows.Forms">
+      <HintPath>..\..\..\..\Windows\Microsoft.NET\Framework\v4.0.30319\System.Windows.Forms.dll</HintPath>
     </Reference>
   </ItemGroup>
 
