@@ -1,0 +1,60 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.IO.Ports" Version="4.7.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Emgu.CV">
+      <HintPath>..\..\PullPara\PullPara\bin\Debug\Emgu.CV.dll</HintPath>
+    </Reference>
+    <Reference Include="Emgu.CV.UI">
+      <HintPath>..\..\PullPara\PullPara\bin\Debug\Emgu.CV.UI.dll</HintPath>
+    </Reference>
+    <Reference Include="Emgu.Util">
+      <HintPath>..\..\PullPara\PullPara\bin\Debug\Emgu.Util.dll</HintPath>
+    </Reference>
+    <Reference Include="NationalInstruments.Common">
+      <HintPath>..\..\..\..\Program Files (x86)\National Instruments\MeasurementStudioVS2008\DotNET\Assemblies\Current\NationalInstruments.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="NationalInstruments.Common.Native">
+      <HintPath>..\..\..\..\Program Files (x86)\National Instruments\MeasurementStudioVS2008\DotNET\Assemblies\Current\NationalInstruments.Common.Native.dll</HintPath>
+    </Reference>
+    <Reference Include="NationalInstruments.MStudioCLM">
+      <HintPath>..\..\..\..\Program Files (x86)\National Instruments\MeasurementStudioVS2008\DotNET\Assemblies\Current\NationalInstruments.MStudioCLM.dll</HintPath>
+    </Reference>
+    <Reference Include="NationalInstruments.NiLmClientDLL">
+      <HintPath>..\..\..\..\Program Files (x86)\National Instruments\MeasurementStudioVS2008\DotNET\Assemblies\Current\NationalInstruments.NiLmClientDLL.dll</HintPath>
+    </Reference>
+    <Reference Include="NationalInstruments.Vision.Acquisition.Imaq">
+      <HintPath>..\..\..\..\Program Files (x86)\National Instruments\MeasurementStudioVS2008\DotNET\Assemblies\Current\NationalInstruments.Vision.Acquisition.Imaq.dll</HintPath>
+    </Reference>
+    <Reference Include="NationalInstruments.Vision.Acquisition.Imaqdx">
+      <HintPath>..\..\..\..\Program Files (x86)\National Instruments\MeasurementStudioVS2008\DotNET\Assemblies\Current\NationalInstruments.Vision.Acquisition.Imaqdx.dll</HintPath>
+    </Reference>
+    <Reference Include="NationalInstruments.Vision.Common">
+      <HintPath>..\..\..\..\Program Files (x86)\National Instruments\MeasurementStudioVS2008\DotNET\Assemblies\Current\NationalInstruments.Vision.Common.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="cvextern.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="msvcp120.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="msvcr120.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="opencv_ffmpeg300.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>
