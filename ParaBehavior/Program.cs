@@ -48,7 +48,7 @@ namespace ParaBehavior
             ImaqBufferCollection buffcollection = _session.CreateBufferCollection((int)bufferCount, ImaqBufferCollectionType.VisionImage);
             _session.RingSetup(buffcollection, 0, false);
             _session.Acquisition.AcquireAsync();
-
+            uint j = buff_out;
             imglist = GetImageList(_session, 5000, 400);
             imagemode = FindMode(imglist);
             modeimage.SetTo(imagemode);
