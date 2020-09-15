@@ -22,6 +22,10 @@ namespace ParaBehavior
 {
     class Program
     {
+        static List<byte[,]> imglist = new List<byte[,]>();
+        static AutoResetEvent mode_reset = new AutoResetEvent(false);
+        static Mat modeimage = new Mat(new System.Drawing.Size(1280, 1024), Emgu.CV.CvEnum.DepthType.Cv8U, 1);
+        static byte[,] imagemode = new byte[1024, 1280];
         static void Main(string[] args)
         {
             SerialPort pyboard = new SerialPort("COM3", 115200);
@@ -40,11 +44,14 @@ namespace ParaBehavior
             int numchannels = 1;
             System.Drawing.Size framesize = new System.Drawing.Size(frameWidth, frameHeight);
             Mat cvimage = new Mat(framesize, Emgu.CV.CvEnum.DepthType.Cv8U, numchannels);
-            Mat modeimage = new Mat(framesize, Emgu.CV.CvEnum.DepthType.Cv8U, numchannels);
             byte[,] data_2D = new byte[frameHeight, frameWidth];
-            byte[,] imagemode = new byte[frameHeight, frameWidth];
+            Console.WriteLine("Please Enter # Frames");
+            string framecount = Console.ReadLine();
+            int frames = Convert.ToInt32(framecount);
+            Console.WriteLine("Please Enter Experiment ID");
+            string exp_id = Console.ReadLine();
+            VideoWriter camvid = new VideoWriter("E:/ParaBehaviorData/" + exp_id + ".AVI", 0, 100, framesize, false);
             ImaqBuffer image = null;
-            List<byte[,]> imglist = new List<byte[,]>();
             ImaqBufferCollection buffcollection = _session.CreateBufferCollection((int)bufferCount, ImaqBufferCollectionType.VisionImage);
             _session.RingSetup(buffcollection, 0, false);
             _session.Acquisition.AcquireAsync();
@@ -56,16 +63,53 @@ namespace ParaBehavior
             CvInvoke.Imshow(camerawindow, modeimage);
             CvInvoke.WaitKey(0);
 
-            while (true)
+            for (int i = 0; i < frames; i++)
             {
+                if (mode_reset.WaitOne(0))
+                {
+                    Console.WriteLine("Clearing Imagelist");
+                    imglist.Clear();
+                    mode_reset.Reset();
+                }
                 image = _session.Acquisition.Extract(j, out buff_out);
                 data_2D = image.ToPixelArray().U8;
                 cvimage.SetTo(data_2D);
+                camvid.Write(cvimage);
                 CvInvoke.Imshow(camerawindow, cvimage);
                 CvInvoke.WaitKey(1);
-            }
-             
+                if (j % 200 == 0)
+                {
+                    byte[,] mode_frame = new byte[frameHeight, frameWidth];
+                    Buffer.BlockCopy(data_2D, 0, mode_frame, 0, data_2D.Length);
+                    imglist.Add(mode_frame);
+                    if (imglist.LongCount() == 40)
+                    {
+                        var modethread = new Thread(() => ModeWrapper(imglist, mode_reset));
+                        modethread.Start();
+                    }
+                }
+                j = buff_out + 1;
 
+            }
+            camvid.Dispose();
+            // Disconnect the camera
+            Console.WriteLine("Done Brah");
+            CvInvoke.DestroyAllWindows();
+
+
+        }
+
+        public static void ModeWrapper(List<byte[,]> md_images, AutoResetEvent md_reset)
+        {
+
+            // Take first X values of list if you think mode calc will take longer than the next addition to the list
+            Console.WriteLine("ModeWrapper Called");
+            // List<byte[,]> first120 = md_images.Take(500).ToList();
+            List<byte[,]> mdlist = md_images.Take(40).ToList();
+            imagemode = FindMode(mdlist);
+            //          imagemode = FindMode(md_images);
+            modeimage.SetTo(imagemode);
+            md_reset.Set();
         }
         static List<byte[,]> GetImageList(ImaqSession ses, int numframes, int mod)
         {
