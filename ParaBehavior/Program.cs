@@ -1,169 +1,176 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
 using System.Drawing;
 using NationalInstruments.Vision.Acquisition.Imaq;
-using NationalInstruments.Vision;
 using Emgu.CV;
-using Emgu.CV.Util;
-using Emgu.CV.CvEnum;
 using Emgu.CV.Structure;
-using System.Runtime.InteropServices;
 using System.Threading;
 using System.IO.Ports;
 using System.IO;
 using System.Threading.Tasks.Dataflow;
-
+using System.Diagnostics;
+using System.Collections.Generic;
 
 namespace ParaBehavior
 {
     class Program
     {
-        static List<byte[,]> imglist = new List<byte[,]>();
-        static AutoResetEvent mode_reset = new AutoResetEvent(false);
-        static Mat modeimage = new Mat(new System.Drawing.Size(1280, 1024), Emgu.CV.CvEnum.DepthType.Cv8U, 1);
-        static byte[,] imagemode = new byte[1024, 1280];
+        static SerialPort pyboard = new SerialPort("COM4", 115200);
+        static Stopwatch experiment_timer = new Stopwatch();
+        static int min_interval = 7000;
+        //static int max_interval = 50000;
+
         static void Main(string[] args)
         {
-            SerialPort pyboard = new SerialPort("COM3", 115200);
+
+            // set up pyboard for shock control
             pyboard.Open();
+            pyboard.WriteLine("import para\r");
+
+            // set up random number generator
+            var rand = new Random();
+            // set up video camera
             var options = new DataflowBlockOptions();
             options.BoundedCapacity = 10;
             MCvScalar gray = new MCvScalar(128, 128, 128);
             string camera_id = "img0"; //this is the ID of the NI-IMAQ board in NI MAX. 
             var _session = new ImaqSession(camera_id);
-            String camerawindow = "ParameciumImage";
-            CvInvoke.NamedWindow(camerawindow);
+            var jlist = new List<uint>(); 
             int frameWidth = 1280;
             int frameHeight = 1024;
             uint bufferCount = 3;
             uint buff_out = 0;
             int numchannels = 1;
-            System.Drawing.Size framesize = new System.Drawing.Size(frameWidth, frameHeight);
+            Size framesize = new Size(frameWidth, frameHeight);
             Mat cvimage = new Mat(framesize, Emgu.CV.CvEnum.DepthType.Cv8U, numchannels);
             byte[,] data_2D = new byte[frameHeight, frameWidth];
-            Console.WriteLine("Please Enter # Frames");
-            string framecount = Console.ReadLine();
-            int frames = Convert.ToInt32(framecount);
             Console.WriteLine("Please Enter Experiment ID");
             string exp_id = Console.ReadLine();
+            Console.WriteLine("Please Enter Condition (1=experiment, 2=control)");
+            int cond = Convert.ToInt32(Console.ReadLine());
+
             VideoWriter camvid = new VideoWriter("E:/ParaBehaviorData/" + exp_id + ".AVI", 0, 100, framesize, false);
+            string logpath = "E:/ParaBehaviorData/" + exp_id + "_log.txt";
             ImaqBuffer image = null;
             ImaqBufferCollection buffcollection = _session.CreateBufferCollection((int)bufferCount, ImaqBufferCollectionType.VisionImage);
             _session.RingSetup(buffcollection, 0, false);
             _session.Acquisition.AcquireAsync();
             uint j = buff_out;
-            imglist = GetImageList(_session, 5000, 400);
-            imagemode = FindMode(imglist);
-            modeimage.SetTo(imagemode);
-            imglist.Clear(); 
-            CvInvoke.Imshow(camerawindow, modeimage);
-            CvInvoke.WaitKey(0);
 
-            for (int i = 0; i < frames; i++)
+            // experiment parameters
+            int trials = 5;  // number of trials
+            int ISI = 2000;    // interstimulus interval (between CS onset and US onset)
+            int US_dur = 2000;  // US (shock) duration (msec)
+            int CS_dur = 2000;  // CS (tone) duration (msec)
+            int CS_freq = 350;  // CS frequency (hz)
+            double mean_interval = 15000;    // mean interval between CS onsets
+
+            int[] CS_times = new int[trials];
+            int[] US_times = new int[trials];
+            CS_times[0] = ExpRnd(mean_interval,rand);
+            for (int i = 1; i < trials; i++)
             {
-                if (mode_reset.WaitOne(0))
+                CS_times[i] = CS_times[i - 1] + ExpRnd(mean_interval, rand);
+            }
+            int experiment_duration = CS_times[trials-1] + 10000;
+            Console.WriteLine(experiment_duration);
+            switch (cond)
+            {
+                case 1:
+                    for (int i = 0; i < trials; i++)
+                    {
+                        US_times[i] = CS_times[i] + ISI;
+                    }
+                    break;
+                case 2:
+                    US_times[0] = ExpRnd(mean_interval, rand);
+                    for(int i = 1; i < trials; i++)
+                    {
+                        US_times[i] = US_times[i - 1] + ExpRnd(mean_interval, rand);
+                    }
+                    break;
+            }
+
+            // write event times to disk
+            File.WriteAllLines("E:/ParaBehaviorData/" + exp_id + "_CS_times.txt", CS_times.Select(tb => tb.ToString()));
+            File.WriteAllLines("E:/ParaBehaviorData/" + exp_id + "_US_times.txt", US_times.Select(tb => tb.ToString()));
+            
+            var tonethread = new Thread(() => PlayTone(CS_dur, CS_freq, CS_times));
+            tonethread.Start();
+            var shockthread = new Thread(() => ShockPara(US_dur, US_times));
+            shockthread.Start();
+
+            experiment_timer.Start();
+
+            while (true)
+            {
+
+                if (experiment_timer.ElapsedMilliseconds > experiment_duration)
                 {
-                    Console.WriteLine("Clearing Imagelist");
-                    imglist.Clear();
-                    mode_reset.Reset();
+                    Console.WriteLine(Convert.ToString(experiment_timer.ElapsedMilliseconds));
+                    camvid.Dispose();
+                    // Disconnect the camera
+                    CvInvoke.DestroyAllWindows();
+                    using (StreamWriter logfile = new StreamWriter(logpath))
+                    {
+                        for (int jind = 0; jind < jlist.Count; jind++)
+                        {
+                            logfile.WriteLine(jlist[jind].ToString());
+                        }
+                    }
+                    break;
                 }
+                // write images to file
                 image = _session.Acquisition.Extract(j, out buff_out);
                 data_2D = image.ToPixelArray().U8;
                 cvimage.SetTo(data_2D);
                 camvid.Write(cvimage);
-                CvInvoke.Imshow(camerawindow, cvimage);
-                CvInvoke.WaitKey(1);
-                if (j % 200 == 0)
-                {
-                    byte[,] mode_frame = new byte[frameHeight, frameWidth];
-                    Buffer.BlockCopy(data_2D, 0, mode_frame, 0, data_2D.Length);
-                    imglist.Add(mode_frame);
-                    if (imglist.LongCount() == 40)
-                    {
-                        var modethread = new Thread(() => ModeWrapper(imglist, mode_reset));
-                        modethread.Start();
-                    }
-                }
+                jlist.Add(j);
+
                 j = buff_out + 1;
-
+                
             }
-            camvid.Dispose();
-            // Disconnect the camera
-            Console.WriteLine("Done Brah");
-            CvInvoke.DestroyAllWindows();
+            
 
 
         }
 
-        public static void ModeWrapper(List<byte[,]> md_images, AutoResetEvent md_reset)
+        public static int ExpRnd(double m, Random rand)
         {
-
-            // Take first X values of list if you think mode calc will take longer than the next addition to the list
-            Console.WriteLine("ModeWrapper Called");
-            // List<byte[,]> first120 = md_images.Take(500).ToList();
-            List<byte[,]> mdlist = md_images.Take(40).ToList();
-            imagemode = FindMode(mdlist);
-            //          imagemode = FindMode(md_images);
-            modeimage.SetTo(imagemode);
-            md_reset.Set();
+            // exponential random numbers (rounded) using the inverse transform method
+            // truncate distribution so intervals aren't too short
+            double y = -Math.Log(1 - rand.NextDouble()) * m;
+            y = Math.Max(y, min_interval);
+            //y = Math.Min(y, max_interval);
+            return (int)y;
         }
-        static List<byte[,]> GetImageList(ImaqSession ses, int numframes, int mod)
-        {
 
-            int frheight = 1024;
-            int frwidth = 1280;
-            List<byte[,]> avg_imglist = new List<byte[,]>();
-            byte[,] avg_data_2D = new byte[frheight, frwidth];
-            uint buff_out = 0;
-            ImaqBuffer image = null;
-            for (uint i = 0; i < numframes; i++)
+        public static void PlayTone(int CS_dur, int CS_freq, int[] times)
+        {
+            int trial = 0;
+            while(trial < times.Length)
             {
-                image = ses.Acquisition.Extract((uint)0, out buff_out);
-                avg_data_2D = image.ToPixelArray().U8;
-                if (i % mod == 0)
+                if (experiment_timer.ElapsedMilliseconds > times[trial])
                 {
-                    byte[,] avgimage_2D = new byte[frheight, frwidth];
-                    Buffer.BlockCopy(avg_data_2D, 0, avgimage_2D, 0, avg_data_2D.Length);
-                    avg_imglist.Add(avgimage_2D);
+                    Console.Beep(CS_freq, CS_dur);  // play tone CS
+                    Console.WriteLine("Trial " + Convert.ToString(trial + 1));
+                    trial++;
                 }
             }
-            return avg_imglist;
         }
 
-        static byte[,] FindMode(List<byte[,]> backgroundimages)
+        public static void ShockPara(int US_dur, int[] times)
         {
-            byte[,] image = backgroundimages[0];
-            byte[,] output = new byte[image.GetLength(0), image.GetLength(1)];
-            uint[] pixelarray = new uint[backgroundimages.Count];
-            for (int rowind = 0; rowind < image.GetLength(0); rowind++)
+            int trial = 0;
+            while (trial < times.Length)
             {
-                for (int colind = 0; colind < image.GetLength(1); colind++)
+                if (experiment_timer.ElapsedMilliseconds > times[trial])
                 {
-                    int background_number = 0;
-                    foreach (byte[,] background in backgroundimages)
-                    {
-                        if (rowind == colind && rowind % 100 == 0)
-                        {
-                            Console.WriteLine(background[rowind, colind]); // This gives pixel vals of a line down the diagonal of the images for all images in modelist. //Values are unique indicating that the copy method is working.  
-                        }
-                        pixelarray[background_number] = background[rowind, colind];
-                        // get mode of this. enter it as the value in output. 
-                        background_number++;
-                    }
-                    uint mode = pixelarray.GroupBy(i => i)
-                              .OrderByDescending(g => g.Count())
-                              .Select(g => g.Key)
-                              .First();
-                    output[rowind, colind] = (byte)mode;
-
+                    pyboard.WriteLine("para.shock_para(" + Convert.ToString(US_dur) + ")\r");
+                    trial++;
                 }
             }
-            Console.WriteLine("Done");
-            return output;
         }
+
     }
 }
