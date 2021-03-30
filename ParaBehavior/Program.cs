@@ -61,9 +61,9 @@ namespace ParaBehavior
             int trials = 5;  // number of trials
             int ISI = 2000;    // interstimulus interval (between CS onset and US onset)
             int US_dur = 2000;  // US (shock) duration (msec)
-            int CS_dur = 2000;  // CS (tone) duration (msec)
+            int CS_dur = 4000;  // CS (tone) duration (msec)
             int CS_freq = 350;  // CS frequency (hz)
-            double mean_interval = 15000;    // mean interval between CS onsets
+            double mean_interval = 20000;    // mean interval between CS onsets
 
             int[] CS_times = new int[trials];
             int[] US_times = new int[trials];
@@ -152,7 +152,8 @@ namespace ParaBehavior
             {
                 if (experiment_timer.ElapsedMilliseconds > times[trial])
                 {
-                    Console.Beep(CS_freq, CS_dur);  // play tone CS
+                    //Console.Beep(CS_freq, CS_dur);  // play tone CS
+                    pyboard.WriteLine("para.move_para(" + Convert.ToString(CS_dur) + ")\r");
                     Console.WriteLine("Trial " + Convert.ToString(trial + 1));
                     trial++;
                 }
